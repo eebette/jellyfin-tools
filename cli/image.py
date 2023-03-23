@@ -17,7 +17,7 @@ def get_font_path(
     """
     Gets a path of a given font file within this package.
     :param font_file: The name of the font file to get the path for. Defaults to the Jellyfin library cover font (Prima
-    Sans Bold".
+    Sans Bold).
     :param font_dir: The parent directory containing the `font_file`. Defaults to the `fonts` folder in this package.
     :param path_to_fonts: The top-level absolute path to `font_dir`. Defaults to the parent directory of this package.
     :return: Absolute path of the font file.

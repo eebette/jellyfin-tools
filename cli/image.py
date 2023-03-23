@@ -128,7 +128,7 @@ def overlay_images(
     """
     Overlays 2 images with a given transparency.
     :param foreground: The foreground image to overlay.
-    :param background: Teh background image to overlay.
+    :param background: The background image to overlay.
     :param foreground_weight: The relative weight of the foreground image to use during the blend. This and
     `background_weight` must add up to 1.
     :param background_weight: The relative weight of the background image to use during the blend. This and

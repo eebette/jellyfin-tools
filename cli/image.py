@@ -44,7 +44,7 @@ def write_font_center(
     :param font_path: The absolute path to the font to use on the image.
     :param font_size: The size of the font to use. Defaults to manually matched 112 in order to be consistent with
     Jellyfin's library cover styling.
-    :param text_color: The RGBA color of the font to use. Defaults to color-matched 252, 252, 252, 0  in order to be
+    :param text_color: The RGBA color of the font to use. Defaults to color-matched 252, 252, 252, 0 in order to be
     consistent with Jellyfin's library cover styling.
     :param features: Pillow features to use while drawing the font. Defaults to remove kerning in order to be consistent
     with Jellyfin's library cover styling.

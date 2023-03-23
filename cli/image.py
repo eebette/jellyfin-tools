@@ -160,19 +160,21 @@ def create_library_image(file: str, library_name: str):
     background_size: Tuple[int, int, int] = resized_background.shape
 
     # Generate a black layer of same size as image for shading overlay
-    foreground = generate_black_layer(*background_size)
+    foreground: np.ndarray = generate_black_layer(*background_size)
 
     # Overlay the base image and the black overlay for shading effect
-    library_cover = overlay_images(foreground, resized_background)
+    library_cover: np.ndarray = overlay_images(foreground, resized_background)
 
     # Write the library name onto the shaded image
     height, width = (background_size[0], background_size[1])
-    library_cover = write_font_center(library_cover, (width, height), library_name)
+    library_cover: np.ndarray = write_font_center(
+        library_cover, (width, height), library_name
+    )
 
     # String manipulation to determine the file path of the input image and output target.
-    file_path = file.rsplit(".", 1)[0]
-    file_extension = file.rsplit(".", 1)[1]
-    output_file_name = file_path + " (Cover)." + file_extension
+    file_path: str = file.rsplit(".", 1)[0]
+    file_extension: str = file.rsplit(".", 1)[1]
+    output_file_name: str = file_path + " (Cover)." + file_extension
 
     # Write the library cover in the same directory as the input file.
     cv2.imwrite(output_file_name, library_cover)

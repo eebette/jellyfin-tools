@@ -1,3 +1,11 @@
+# Library Covers TL;DR
+
+## Install
+
+
+## Use
+`jellyfin-cover --image /path/to/image.png --title Library`
+
 # Overview
 The purpose of this library is to share (non-plugin) tools I use for managing my Jellyfin instance and/or media library.
 

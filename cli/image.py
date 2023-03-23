@@ -149,6 +149,7 @@ def create_library_image(file: str, library_name: str):
     least that large. The output of this function will write a new file to the directory of this file with " (Cover)"
     appended.
     :param library_name: The text to use for the library image.
+    :return: The file path of the output image.
     """
     # Read in the image file as a cv2 image.
     background: np.ndarray = cv2.imread(file)
@@ -178,6 +179,8 @@ def create_library_image(file: str, library_name: str):
 
     # Write the library cover in the same directory as the input file.
     cv2.imwrite(output_file_name, library_cover)
+
+    return output_file_name
 
     def main():
         pass

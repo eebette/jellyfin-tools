@@ -16,7 +16,8 @@ def run(args):
     t = 0
     for i in args.image:
         title = args.title[t]
-        create_library_image(file=i, library_name=title)
+        output = create_library_image(file=i, library_name=title)
+        print(f"Generated image to: {output}")
         t += 1
 
 

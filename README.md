@@ -24,6 +24,7 @@ Install
 ## `jellyfin-cover`
 ### The Problem
 Here's what a Jellyfin-generated library image looks like.
+
 ![img_1.png](docs/img_1.png)
 
 Unfortunately, this image is randomly generated from the backdrops of the media in the library, so if we get one we 

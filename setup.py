@@ -26,7 +26,7 @@ setup(
     packages=find_packages(include=["cli", "cli.fonts", "install"]),
     package_data={"": ["Prima Sans Bold.otf"]},
     url="https://github.com/eebette/Jellyfin-Tools",
-    license="",
+    license="LICENSE.txt",
     author="Eric Bette",
     author_email="eric.bette@pm.me",
     description="Scripted tools for helping manage a Jellyfin library.",

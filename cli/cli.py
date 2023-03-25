@@ -4,14 +4,15 @@ import sys
 
 # Local imports
 from cli.image import create_library_image
-
+from install import fix_install
 
 def run(args):
     """
     Calls `create_library_image` for each respective image and library title pair.
     :param args: The argparse args to use for this function.
     """
-    # The number of image args must match the number of title args.
+    # The number of image args must match the number of title args.()
+    fix_install.check_dll()
     assert len(args.image) == len(args.title)
     t = 0
     for i in args.image:

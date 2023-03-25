@@ -14,6 +14,16 @@ from PIL import features
 from typing.io import IO
 
 
+def check_dll():
+    """
+    Portable checker requiring user confirmation for dll installation.
+    """
+    if not features.check('raqm'):
+        if input("libraqm and/or fribidi dll's are not found! This package will not work without these dll's. Install them"
+              "now? [y/N] (default: y)").lower() in [None, "y"]:
+            install_dll()
+
+
 def get_dll(url: str = "https://github.com/eebette/Jellyfin-Tools/raw/master/resources/libraqm-0.7.1.dll.zip") -> bytes:
     """
     Gets the dll file from the provided URL and loads into memory.

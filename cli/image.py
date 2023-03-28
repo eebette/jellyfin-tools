@@ -2,13 +2,13 @@
 import os
 from pathlib import Path
 from typing import List, Tuple
-from importlib import reload
+
 # Package imports
 import cv2
 import numpy as np
-
 from PIL import ImageFont, ImageDraw, Image
 
+# Local imports
 from config import Image
 
 

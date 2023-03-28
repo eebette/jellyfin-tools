@@ -13,6 +13,7 @@ from urllib.request import urlopen
 from PIL import features
 from typing.io import IO
 
+# Local imports
 from config import DLL
 
 

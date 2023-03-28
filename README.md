@@ -2,6 +2,7 @@
 
 ## Install
 
+> git clone https://github.com/eebette/Jellyfin-Tools && pip install ./Jellyfin-Tools
 
 ## Use
 `jellyfin-cover --image /path/to/image.png --title Library`
@@ -16,11 +17,19 @@ styling library on the custom image.
 
 # Installation
 
-## From Repository (Recommended)
+## Manual Install
 
-## Manual
+### Prerequisites
 
+* [Python/pip](https://www.python.org/downloads/)
 
+### Download
+
+> git clone https://github.com/eebette/Jellyfin-Tools
+
+### Install
+
+> pip install ./Jellyfin-Tools
 
 # Tools
 ## `jellyfin-cover`

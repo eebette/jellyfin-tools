@@ -11,12 +11,20 @@ from urllib.request import urlopen
 
 # Other package imports
 from PIL import features
-from typing.io import IO, BinaryIO
+from typing.io import IO
 
 
-def get_dll(
-    url: str = "https://github.com/eebette/Jellyfin-Tools/raw/master/resources/libraqm-0.7.1.dll.zip"
-) -> bytes:
+def check_dll():
+    """
+    Portable checker requiring user confirmation for dll installation.
+    """
+    if not features.check('raqm'):
+        if input("libraqm and/or fribidi dll's are not found! This package will not work without these dll's. Install them"
+              "now? [y/N] (default: y)").lower() in [None, "y"]:
+            install_dll()
+
+
+def get_dll(url: str = "https://github.com/eebette/Jellyfin-Tools/raw/master/resources/libraqm-0.7.1.dll.zip") -> bytes:
     """
     Gets the dll file from the provided URL and loads into memory.
     :param url: The URL string of the dll.
@@ -48,16 +56,14 @@ def extract_zip_to_dir(file, target_directory, path_hint) -> None:
             file_name: str = os.path.basename(nested_file)
 
             # Skip this file/loop iteration if file (1) isn't a .dll and (2) doesn't match the path hint filter
-            if (not file_name.endswith(".dll")) or (
-                not f"/{path_hint}/" in nested_file
-            ):
+            if (not file_name.endswith(".dll")) or (not f"/{path_hint}/" in nested_file):
                 continue
 
             # Open the file from the zip as source
             source: IO = zip_directory.open(nested_file)
 
             # Open the target directory
-            target: BinaryIO = open(os.path.join(target_directory, file_name), "wb")
+            target: IO = open(os.path.join(target_directory, file_name), "wb")
 
             # Write source file to target directory
             with source, target:
@@ -100,7 +106,7 @@ def install_dll() -> None:
     """
     Installs the dlls needed by Pillow on Windows for certain features.
     """
-    if features.check("raqm"):
+    if features.check('raqm'):
         print("libraqm and/or fribidi dlls already installed. Nothing to do here!")
 
     else:

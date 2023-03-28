@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="Jellyfin-Tools",
+    name="jellyfin-tools",
     version="1.0.0",
     packages=find_packages(include=["cli", "cli.fonts", "install"]),
     package_data={"": ["Prima Sans Bold.otf"]},

@@ -1,6 +1,9 @@
+# Standard library imports
 from setuptools import setup, find_packages
 from setuptools.command.develop import develop
 from setuptools.command.install import install
+
+# Local imports
 from install import fix_install
 
 
@@ -30,15 +33,7 @@ setup(
     author="Eric Bette",
     author_email="eric.bette@pm.me",
     description="Scripted tools for helping manage a Jellyfin library.",
-    install_requires=[
-        "numpy",
-        "Pillow",
-        "fonttools",
-        "opencv-contrib-python"
-    ],
-    cmdclass={
-        'develop': PostDevelopCommand,
-        'install': PostInstallCommand,
-    },
+    install_requires=["numpy", "Pillow", "fonttools", "opencv-contrib-python"],
+    cmdclass={"develop": PostDevelopCommand, "install": PostInstallCommand},
     entry_points={"console_scripts": ["jellyfin-cover=cli.cli:main"]},
 )

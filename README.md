@@ -16,9 +16,11 @@ styling library on the custom image.
 
 # Installation
 
-Download
+## From Repository (Recommended)
 
-Install
+## Manual
+
+
 
 # Tools
 ## `jellyfin-cover`

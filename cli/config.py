@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Tuple, List
 
 
-class Image(Enum):
+class Params(Enum):
     FONT_FILE: str = "Prima Sans Bold.otf"
     FONT_DIRECTORY: str = "fonts"
     FONT_SIZE: int = 112

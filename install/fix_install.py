@@ -14,7 +14,7 @@ from PIL import features
 from typing.io import IO
 
 # Local imports
-from config import DLL
+from .config import Dll
 
 
 def check_dll():
@@ -29,7 +29,7 @@ def check_dll():
             print("Skipping install. Library cover CLI functionality may return error.")
 
 
-def get_dll(url: str = DLL.URL) -> bytes:
+def get_dll(url: str = Dll.URL.value) -> bytes:
     """
     Gets the dll file from the provided URL and loads into memory.
     :param url: The URL string of the dll.

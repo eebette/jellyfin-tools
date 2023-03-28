@@ -9,12 +9,12 @@ import numpy as np
 from PIL import ImageFont, ImageDraw, Image
 
 # Local imports
-from config import Image
+from .config import Params
 
 
 def get_font_path(
-        font_file: str = Image.FONT_FILE,
-        font_directory: str = Image.FONT_DIRECTORY,
+        font_file: str = Params.FONT_FILE.value,
+        font_directory: str = Params.FONT_DIRECTORY.value,
         path_to_fonts: str = Path(__file__).parent,
 ) -> str:
     """
@@ -34,10 +34,10 @@ def write_font_center(
         size: Tuple[int, int],
         message: str,
         font_path: str,
-        font_size: int = Image.FONT_SIZE,
-        font_color: Tuple[int, int, int, int] = Image.FONT_COLOR,
-        features: List[str] = Image.FONT_FEATURES,
-        height_offset: int = Image.HEIGHT_OFFSET,
+        font_size: int = Params.FONT_SIZE.value,
+        font_color: Tuple[int, int, int, int] = Params.FONT_COLOR.value,
+        features: List[str] = Params.FONT_FEATURES.value,
+        height_offset: int = Params.HEIGHT_OFFSET.value,
 ) -> np.core.multiarray:
     """
     Function for writing text in a given font on an image.
@@ -89,8 +89,8 @@ def write_font_center(
 
 def resize_image(
         image: np.ndarray,
-        width: int = Image.WIDTH,
-        height: int = Image.HEIGHT,
+        width: int = Params.WIDTH.value,
+        height: int = Params.HEIGHT.value,
         interpolation: int = cv2.INTER_LINEAR,
 ) -> np.ndarray:
     """
@@ -125,8 +125,8 @@ def generate_black_layer(
 def overlay_images(
         foreground: np.ndarray,
         background: np.ndarray,
-        foreground_weight: float = Image.FOREGROUND_WEIGHT,
-        background_weight: float = Image.BACKGROUND_WEIGHT,
+        foreground_weight: float = Params.FOREGROUND_WEIGHT.value,
+        background_weight: float = Params.BACKGROUND_WEIGHT.value,
 ) -> np.ndarray:
     """
     Overlays 2 images with a given transparency.

@@ -15,6 +15,7 @@ from typing.io import IO
 
 from config import DLL
 
+
 def check_dll():
     """
     Portable checker requiring user confirmation for dll installation.

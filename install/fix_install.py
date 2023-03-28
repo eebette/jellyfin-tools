@@ -134,8 +134,8 @@ def install_dll() -> None:
         # Extract the downloaded dll's to the Python directory
         print("Extracting the downloaded dll's to the Python directory...")
         extract_zip_to_dir(dll, python_directory, sys_architecture)
-        print("Installation Done! If you were prompted to install from a different command, then please run your "
-              "command again.")
+        print("Installation Done! Please run your command again.")
+        exit(0)
 
 
 def main() -> None:

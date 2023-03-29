@@ -13,18 +13,23 @@ from urllib.request import urlopen
 from PIL import features
 from typing.io import IO
 
+# Local imports
+from .config import Dll
+
 
 def check_dll():
     """
     Portable checker requiring user confirmation for dll installation.
     """
     if not features.check('raqm'):
-        if input("libraqm and/or fribidi dll's are not found! This package will not work without these dll's. Install them"
-              "now? [y/N] (default: y)").lower() in [None, "y"]:
+        if input("libraqm and/or fribidi dll's are not found! This package will not work without these dll's. "
+                 "Install them now? [y/N] (default: y)").lower() in ["", "y"]:
             install_dll()
+        else:
+            print("Skipping install. Library cover CLI functionality may return error.")
 
 
-def get_dll(url: str = "https://github.com/eebette/Jellyfin-Tools/raw/master/resources/libraqm-0.7.1.dll.zip") -> bytes:
+def get_dll(url: str = Dll.URL.value) -> bytes:
     """
     Gets the dll file from the provided URL and loads into memory.
     :param url: The URL string of the dll.
@@ -129,11 +134,12 @@ def install_dll() -> None:
         # Extract the downloaded dll's to the Python directory
         print("Extracting the downloaded dll's to the Python directory...")
         extract_zip_to_dir(dll, python_directory, sys_architecture)
-        print("Done!")
+        print("Installation Done! Please run your command again.")
+        exit(0)
 
 
 def main() -> None:
-    install_dll()
+    check_dll()
 
 
 if __name__ == "__main__":

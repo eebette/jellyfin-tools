@@ -8,33 +8,36 @@ import cv2
 import numpy as np
 from PIL import ImageFont, ImageDraw, Image
 
+# Local imports
+from .config import Params
+
 
 def get_font_path(
-    font_file: str = "Prima Sans Bold.otf",
-    font_dir: str = "fonts",
-    path_to_fonts: str = Path(__file__).parent,
+        font_file: str = Params.FONT_FILE.value,
+        font_directory: str = Params.FONT_DIRECTORY.value,
+        path_to_fonts: str = Path(__file__).parent,
 ) -> str:
     """
     Gets a path of a given font file within this package.
     :param font_file: The name of the font file to get the path for. Defaults to the Jellyfin library cover font (Prima
     Sans Bold).
-    :param font_dir: The parent directory containing the `font_file`. Defaults to the `fonts` folder in this package.
+    :param font_directory: The parent directory containing the `font_file`. Defaults to the `fonts` folder in this package.
     :param path_to_fonts: The top-level absolute path to `font_dir`. Defaults to the parent directory of this package.
     :return: Absolute path of the font file.
     """
-    font_path: str = os.path.join(path_to_fonts, font_dir, font_file)
+    font_path: str = os.path.join(path_to_fonts, font_directory, font_file)
     return font_path
 
 
 def write_font_center(
-    image: np.ndarray,
-    size: Tuple[int, int],
-    message: str,
-    font_path: str = get_font_path(),
-    font_size: int = 112,
-    text_color: Tuple[int, int, int, int] = (252, 252, 252, 0),
-    features: List[str] = ["-kern"],
-    height_offset: int = 64,
+        image: np.ndarray,
+        size: Tuple[int, int],
+        message: str,
+        font_path: str,
+        font_size: int = Params.FONT_SIZE.value,
+        font_color: Tuple[int, int, int, int] = Params.FONT_COLOR.value,
+        features: List[str] = Params.FONT_FEATURES.value,
+        height_offset: int = Params.HEIGHT_OFFSET.value,
 ) -> np.core.multiarray:
     """
     Function for writing text in a given font on an image.
@@ -44,7 +47,7 @@ def write_font_center(
     :param font_path: The absolute path to the font to use on the image.
     :param font_size: The size of the font to use. Defaults to manually matched 112 in order to be consistent with
     Jellyfin's library cover styling.
-    :param text_color: The RGBA color of the font to use. Defaults to color-matched 252, 252, 252, 0 in order to be
+    :param font_color: The RGBA color of the font to use. Defaults to color-matched 252, 252, 252, 0 in order to be
     consistent with Jellyfin's library cover styling.
     :param features: Pillow features to use while drawing the font. Defaults to remove kerning in order to be consistent
     with Jellyfin's library cover styling.
@@ -75,7 +78,7 @@ def write_font_center(
         ),
         message,
         font=font,
-        fill=text_color,
+        fill=font_color,
         features=features,
     )
 
@@ -85,10 +88,10 @@ def write_font_center(
 
 
 def resize_image(
-    image: np.ndarray,
-    width: int = 960,
-    height: int = 540,
-    interpolation: int = cv2.INTER_LINEAR,
+        image: np.ndarray,
+        width: int = Params.WIDTH.value,
+        height: int = Params.HEIGHT.value,
+        interpolation: int = cv2.INTER_LINEAR,
 ) -> np.ndarray:
     """
 
@@ -105,7 +108,7 @@ def resize_image(
 
 
 def generate_black_layer(
-    height: int, width: int, channels: int, dtype: str = "uint8"
+        height: int, width: int, channels: int, dtype: str = "uint8"
 ) -> np.ndarray:
     """
     Generates a layer of black to overlay on the base image used for the library cover.
@@ -120,10 +123,10 @@ def generate_black_layer(
 
 
 def overlay_images(
-    foreground: np.ndarray,
-    background: np.ndarray,
-    foreground_weight: float = 0.5,
-    background_weight: float = 0.5,
+        foreground: np.ndarray,
+        background: np.ndarray,
+        foreground_weight: float = Params.FOREGROUND_WEIGHT.value,
+        background_weight: float = Params.BACKGROUND_WEIGHT.value,
 ) -> np.ndarray:
     """
     Overlays 2 images with a given transparency.
@@ -167,9 +170,10 @@ def create_library_image(file: str, library_name: str):
     library_cover: np.ndarray = overlay_images(foreground, resized_background)
 
     # Write the library name onto the shaded image
+    font_path = get_font_path()
     height, width = (background_size[0], background_size[1])
     library_cover: np.ndarray = write_font_center(
-        library_cover, (width, height), library_name
+        library_cover, (width, height), library_name, font_path
     )
 
     # String manipulation to determine the file path of the input image and output target.

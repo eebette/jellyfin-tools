@@ -3,6 +3,7 @@ import argparse
 import sys
 
 # Local imports
+from cli.config import Params
 from cli.image import create_library_image
 from install import fix_install
 
@@ -29,10 +30,12 @@ def run(args):
 
     # The number of image args must match the number of title args.()
     assert len(args.image) == len(args.title)
+    # The shadow opacity should be clamped between 0 and 1.
+    args.shadow = max(0, min(1, args.shadow))
     t = 0
     for i in args.image:
         title = args.title[t]
-        output = create_library_image(file=i, library_name=title)
+        output = create_library_image(file=i, library_name=title, shadow=args.shadow)
         print(f"Generated image to: {output}")
         t += 1
 
@@ -63,6 +66,10 @@ def main():
 
     pipeline_parser.add_argument(
         "--title", dest="title", action="store", nargs="+", required=True
+    )
+
+    pipeline_parser.add_argument(
+        "--shadow", dest="shadow", action="store", type=float, default=Params.FOREGROUND_WEIGHT.value
     )
 
     # Parse the args

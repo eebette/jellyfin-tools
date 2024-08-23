@@ -51,6 +51,14 @@ collection in Jellyfin.
 
 >ℹ️  It is recommended to use a️n image which is already in `16:9` (1080p) aspect ratio
 
+### Styling Options
+
+You can use the `--shadow ` flag to give a `0.0`-`1.0` percentage transparency to the shadow overlay. 
+Use `0` for no shadow darkening of the cover image. For example:
+
+> `jellyfin-cover --image /path/to/image.png --title Library --shadow 0`
+
+
 # Tools
 ## `jellyfin-cover`
 ### The Problem

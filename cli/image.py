@@ -144,7 +144,7 @@ def overlay_images(
     return image
 
 
-def create_library_image(file: str, library_name: str):
+def create_library_image(file: str, library_name: str, shadow: float = Params.FOREGROUND_WEIGHT.value) -> str:
     """
     The main function for this module. Combines other functions to generate a library image for use in Jellyfin or Emby.
     Outputs to the same directory as the input file.
@@ -167,7 +167,7 @@ def create_library_image(file: str, library_name: str):
     foreground: np.ndarray = generate_black_layer(*background_size)
 
     # Overlay the base image and the black overlay for shading effect
-    library_cover: np.ndarray = overlay_images(foreground, resized_background)
+    library_cover: np.ndarray = overlay_images(foreground, resized_background, shadow, 1.0-shadow)
 
     # Write the library name onto the shaded image
     font_path = get_font_path()

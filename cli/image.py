@@ -70,6 +70,14 @@ def write_font_center(
         (0, 0), message, font=font, features=features
     )
 
+    # Figure out how far below the baseline the text goes
+    # "ls" is "left baseline" as our (0,0) anchor
+    _, _, _, descender_height = draw.textbbox(
+        (0, 0), message, anchor="ls", font=font, features=features
+    )
+
+    draw_height -= descender_height
+
     # Draw the text in the center of the image, accounting for offset
     draw.text(
         (

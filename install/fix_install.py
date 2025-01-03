@@ -11,7 +11,7 @@ from urllib.request import urlopen
 
 # Other package imports
 from PIL import features
-from typing.io import IO
+from typing import IO
 
 # Local imports
 from .config import Dll

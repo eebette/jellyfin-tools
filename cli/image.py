@@ -1,8 +1,7 @@
 # Standard library imports
 import os
-from codecs import BOM_UTF16
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 # Package imports
 import cv2

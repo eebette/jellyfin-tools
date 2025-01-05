@@ -1,7 +1,5 @@
-numpy~=1.24.2
-Pillow~=9.4.0
-pip
-wheel==0.40.0
-setuptools==67.6.0
-fonttools~=4.39.2
+numpy~=2.2.1
+Pillow~=11.1.0
+setuptools==75.6.0
+fonttools~=4.55.3
 opencv-contrib-python

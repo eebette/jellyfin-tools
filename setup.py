@@ -11,6 +11,7 @@ setup(
     author_email="eric.bette@pm.me",
     description="Scripted tools for helping manage a Jellyfin library.",
     install_requires=[
+        "setuptools",
         "numpy",
         "Pillow",
         "fonttools",

@@ -30,14 +30,15 @@ def run(args):
 
     # The number of image args must match the number of title args.()
     assert len(args.image) == len(args.title)
+
     # The shadow opacity should be clamped between 0 and 1.
     args.shadow = max(0, min(1, args.shadow))
-    t = 0
-    for i in args.image:
+    for t, i in enumerate(args.image):
         title = args.title[t]
-        output = create_library_image(file=i, library_name=title, shadow=args.shadow)
+        output = create_library_image(
+            file=i, library_name=title, destination=args.destination, shadow=args.shadow
+        )
         print(f"Generated image to: {output}")
-        t += 1
 
 
 def main():
@@ -69,7 +70,19 @@ def main():
     )
 
     pipeline_parser.add_argument(
-        "--shadow", dest="shadow", action="store", type=float, default=Params.FOREGROUND_WEIGHT.value
+        "--destination",
+        dest="destination",
+        action="store",
+        type=str,
+        default=str(),
+    )
+
+    pipeline_parser.add_argument(
+        "--shadow",
+        dest="shadow",
+        action="store",
+        type=float,
+        default=Params.FOREGROUND_WEIGHT.value,
     )
 
     # Parse the args

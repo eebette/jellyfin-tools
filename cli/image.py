@@ -1,7 +1,8 @@
 # Standard library imports
 import os
+from codecs import BOM_UTF16
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 # Package imports
 import cv2
@@ -13,9 +14,9 @@ from .config import Params
 
 
 def get_font_path(
-        font_file: str = Params.FONT_FILE.value,
-        font_directory: str = Params.FONT_DIRECTORY.value,
-        path_to_fonts: str = Path(__file__).parent,
+    font_file: str = Params.FONT_FILE.value,
+    font_directory: str = Params.FONT_DIRECTORY.value,
+    path_to_fonts: str = Path(__file__).parent,
 ) -> str:
     """
     Gets a path of a given font file within this package.
@@ -30,15 +31,15 @@ def get_font_path(
 
 
 def write_font_center(
-        image: np.ndarray,
-        size: Tuple[int, int],
-        message: str,
-        font_path: str,
-        font_size: int = Params.FONT_SIZE.value,
-        font_color: Tuple[int, int, int, int] = Params.FONT_COLOR.value,
-        features: List[str] = Params.FONT_FEATURES.value,
-        height_offset: int = Params.HEIGHT_OFFSET.value,
-) -> np.core.multiarray:
+    image: np.ndarray,
+    size: Tuple[int, int],
+    message: str,
+    font_path: str,
+    font_size: int = Params.FONT_SIZE.value,
+    font_color: Tuple[int, int, int, int] = Params.FONT_COLOR.value,
+    features: List[str] = Params.FONT_FEATURES.value,
+    height_offset: int = Params.HEIGHT_OFFSET.value,
+) -> np.array:
     """
     Function for writing text in a given font on an image.
     :param image: The image on which to draw text.
@@ -91,15 +92,15 @@ def write_font_center(
     )
 
     # Convert the image into a numpy array
-    image: np.core.multiarray = np.array(pillow_image)
+    image: np.array = np.array(pillow_image)
     return image
 
 
 def resize_image(
-        image: np.ndarray,
-        width: int = Params.WIDTH.value,
-        height: int = Params.HEIGHT.value,
-        interpolation: int = cv2.INTER_LINEAR,
+    image: np.ndarray,
+    width: int = Params.WIDTH.value,
+    height: int = Params.HEIGHT.value,
+    interpolation: int = cv2.INTER_LINEAR,
 ) -> np.ndarray:
     """
 
@@ -116,7 +117,7 @@ def resize_image(
 
 
 def generate_black_layer(
-        height: int, width: int, channels: int, dtype: str = "uint8"
+    height: int, width: int, channels: int, dtype: str = "uint8"
 ) -> np.ndarray:
     """
     Generates a layer of black to overlay on the base image used for the library cover.
@@ -131,10 +132,10 @@ def generate_black_layer(
 
 
 def overlay_images(
-        foreground: np.ndarray,
-        background: np.ndarray,
-        foreground_weight: float = Params.FOREGROUND_WEIGHT.value,
-        background_weight: float = Params.BACKGROUND_WEIGHT.value,
+    foreground: np.ndarray,
+    background: np.ndarray,
+    foreground_weight: float = Params.FOREGROUND_WEIGHT.value,
+    background_weight: float = Params.BACKGROUND_WEIGHT.value,
 ) -> np.ndarray:
     """
     Overlays 2 images with a given transparency.
@@ -152,7 +153,12 @@ def overlay_images(
     return image
 
 
-def create_library_image(file: str, library_name: str, shadow: float = Params.FOREGROUND_WEIGHT.value) -> str:
+def create_library_image(
+    file: str,
+    library_name: str,
+    destination: str = str(),
+    shadow: float = Params.FOREGROUND_WEIGHT.value,
+) -> Path:
     """
     The main function for this module. Combines other functions to generate a library image for use in Jellyfin or Emby.
     Outputs to the same directory as the input file.
@@ -160,6 +166,8 @@ def create_library_image(file: str, library_name: str, shadow: float = Params.FO
     least that large. The output of this function will write a new file to the directory of this file with " (Cover)"
     appended.
     :param library_name: The text to use for the library image.
+    :param destination:
+    :param shadow: The foreground weight to use for the library image.
     :return: The file path of the output image.
     """
     # Read in the image file as a cv2 image.
@@ -175,7 +183,9 @@ def create_library_image(file: str, library_name: str, shadow: float = Params.FO
     foreground: np.ndarray = generate_black_layer(*background_size)
 
     # Overlay the base image and the black overlay for shading effect
-    library_cover: np.ndarray = overlay_images(foreground, resized_background, shadow, 1.0-shadow)
+    library_cover: np.ndarray = overlay_images(
+        foreground, resized_background, shadow, 1.0 - shadow
+    )
 
     # Write the library name onto the shaded image
     font_path = get_font_path()
@@ -185,17 +195,24 @@ def create_library_image(file: str, library_name: str, shadow: float = Params.FO
     )
 
     # String manipulation to determine the file path of the input image and output target.
-    file_path: str = file.rsplit(".", 1)[0]
-    file_extension: str = file.rsplit(".", 1)[1]
-    output_file_name: str = file_path + " (Cover)." + file_extension
+
+    if len(destination) == 0:
+        path = Path(file)
+        file_path: Path = path.parents[0]
+        file_name: str = path.stem
+        file_extension: str = path.suffix
+        output_file_name: str = f"{str(file_path)}/{file_name} (Cover){file_extension}"
+    else:
+        if os.path.isdir(destination):
+            file_name: str = Path(file).stem
+            file_extension: str = Path(file).suffix
+            output_file_name: str = (
+                f"{destination}/{file_name} (Cover){file_extension}"
+            )
+        else:
+            output_file_name: str = destination
 
     # Write the library cover in the same directory as the input file.
     cv2.imwrite(output_file_name, library_cover)
 
-    return output_file_name
-
-    def main():
-        pass
-
-    if __name__ == "__main__":
-        main()
+    return Path(output_file_name)

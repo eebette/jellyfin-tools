@@ -8,10 +8,10 @@ import shutil
 import sys
 import zipfile
 from urllib.request import urlopen
+from typing import IO
 
 # Other package imports
 from PIL import features
-from typing.io import IO
 
 # Local imports
 from .config import Dll

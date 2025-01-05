@@ -6,7 +6,7 @@
 
 ## Use
 
-`jellyfin-cover create --image /path/to/image.png --title Library`
+`jellyfin-tools cover create --image /path/to/image.png --title Library`
 
 # Overview
 The purpose of this library is to share (non-plugin) tools I use for managing my Jellyfin instance and/or media library.
@@ -51,23 +51,28 @@ collection in Jellyfin.
 
 >ℹ️  It is recommended to use a️n image which is already in `16:9` (1080p) aspect ratio
 
+### Destination option
+
+You can use the `--destination ` flag to provide a destination path to which to write the file. A path must be provided,
+ but the file name is optional. 
+
 ### Styling Options
 
 You can use the `--shadow ` flag to give a `0.0`-`1.0` percentage transparency to the shadow overlay. 
 Use `0` for no shadow darkening of the cover image. For example:
 
-> `jellyfin-cover --image /path/to/image.png --title Library --shadow 0`
+> `jellyfin-tools create --image /path/to/image.png --title Library --shadow 0`
 
 
 # Tools
-## `jellyfin-cover`
+## `cover`
 ### The Problem
 Here's what a Jellyfin-generated library image looks like.
 
 ![img_1.png](docs/img_1.png)
 
 Unfortunately, this image is randomly generated from the backdrops of the media in the library, so if we get one we 
-don't like, we just just have to keep generating new ones until we get one that looks good.
+don't like, we just have to keep generating new ones until we get one that looks good.
 
 ---
 Here's what a custom library image looks like when used as a custom library cover in Jellyfin:

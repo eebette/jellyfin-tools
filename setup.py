@@ -17,6 +17,5 @@ setup(
         "fonttools",
         "opencv-contrib-python"
     ],
-    entry_points={"console_scripts": ["jellyfin-cover=cli.cli:main"]},
+    entry_points={"console_scripts": ["jellyfin-tools=cli.cli:main"]},
 )
-

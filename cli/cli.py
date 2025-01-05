@@ -46,7 +46,7 @@ def main():
     Entry point into the CLI.
     """
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        "jellyfin-cover",
+        "jellyfin-tools",
         description="Command line tool for generating library covers consistent with Jellyfin and Emby's styling.",
     )
 
@@ -58,18 +58,24 @@ def main():
         title="subparsers", dest="subcommand", required=True
     )
 
-    pipeline_parser = subparser.add_parser("create")
-    pipeline_parser.set_defaults(func=run)
+    cover_parser = subparser.add_parser("cover")
 
-    pipeline_parser.add_argument(
+    cover_subparser = cover_parser.add_subparsers(
+        title="subparsers", dest="subcommand", required=True
+    )
+
+    create_parser = cover_subparser.add_parser("create")
+    create_parser.set_defaults(func=run)
+
+    create_parser.add_argument(
         "--image", dest="image", action="store", nargs="+", required=True
     )
 
-    pipeline_parser.add_argument(
+    create_parser.add_argument(
         "--title", dest="title", action="store", nargs="+", required=True
     )
 
-    pipeline_parser.add_argument(
+    create_parser.add_argument(
         "--destination",
         dest="destination",
         action="store",
@@ -77,7 +83,7 @@ def main():
         default=str(),
     )
 
-    pipeline_parser.add_argument(
+    create_parser.add_argument(
         "--shadow",
         dest="shadow",
         action="store",

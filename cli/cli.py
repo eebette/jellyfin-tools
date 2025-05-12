@@ -1,6 +1,7 @@
 # Standard library imports
 import argparse
 import sys
+import re
 
 # Local imports
 from cli.config import Params
@@ -35,6 +36,11 @@ def run(args):
     args.shadow = max(0, min(1, args.shadow))
     for t, i in enumerate(args.image):
         title = args.title[t]
+        
+        # replace pseudo line breaks and support escaped backslash
+        title = re.sub(r"[^\\]?\\n", "\n", title)
+        title = title.replace("\\\\", "\\")
+        
         output = create_library_image(
             file=i, library_name=title, destination=args.destination, shadow=args.shadow
         )

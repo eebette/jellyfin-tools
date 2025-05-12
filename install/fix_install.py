@@ -23,7 +23,7 @@ def check_dll():
     """
     if not features.check('raqm'):
         if input("libraqm and/or fribidi dll's are not found! This package will not work without these dll's. "
-                 "Install them now? [y/N] (default: y)").lower() in ["", "y"]:
+                 "Install them now? [Y/n]").lower() in ["", "y"]:
             install_dll()
         else:
             print("Skipping install. Library cover CLI functionality may return error.")

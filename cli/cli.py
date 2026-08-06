@@ -5,23 +5,8 @@ import sys
 # Local imports
 from cli.config import Params
 from cli.image import create_library_image
-from install import fix_install
 
 
-def check_fix_dll(func):
-    """
-    Decorator function for checking the presence of dll's needed for the functionality of the function.
-    :param func: The function to wrap.
-    """
-
-    def wrapper(*args, **kwargs):
-        fix_install.check_dll()
-        func(*args, **kwargs)
-
-    return wrapper
-
-
-@check_fix_dll
 def run(args):
     """
     Calls `create_library_image` for each respective image and library title pair.

@@ -106,16 +106,18 @@ Much better!
 
 # FAQ
 
-## I got a message saying `libraqm and/or fribidi dll's are not found!`
+## Older versions asked me to install dll's (`libraqm and/or fribidi dll's are not found!`)
 
-This probably means that you're on Windows, which is (sometimes) missing some dll's which are critical for some 
-functionality in the Python package Pillow. This includes the ability to scale, color, and draw on the base image 
-within this package.
+Versions up to `1.0.2` shipped an interactive installer that tried to download Windows dll's for Pillow's `raqm`
+text-shaping engine. On Linux and macOS this could never succeed (Windows dll's don't load there), which caused an
+endless install prompt loop ([#8](https://github.com/eebette/jellyfin-tools/issues/8)).
 
-Answering affirmatively to the prompt will run a short script to "install" those dll's into your local Python
-environment:
-1) The `libraqm` `.zip` file is copied from this repository
-2) The correct dll for your architecture (x64 or x86) is moved into the directory containing your `python.exe`
+As of `1.1.0` the installer is gone, and no manual steps are required:
 
->❗ Note that uninstalling this package or Python from your system will likely not delete these files. Please manually
-> delete them if you do not want them on your system.
+- Modern Pillow wheels already bundle `raqm` on all platforms (statically linked on Windows).
+- On Linux and macOS, Pillow's bundled `raqm` loads the system `fribidi` library at runtime when it is present
+  (`apt install libfribidi0`, `dnf install fribidi`, or `brew install fribidi`).
+- When `raqm` isn't available, the CLI automatically falls back to Pillow's basic text layout engine. For the bundled
+  font the rendered output is visually identical, and no prompt or install step happens.
+
+Upgrade with: `pip install --upgrade jellyfin-tools`

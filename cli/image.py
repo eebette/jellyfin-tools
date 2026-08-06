@@ -1,12 +1,13 @@
 # Standard library imports
 import os
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 # Package imports
 import cv2
 import numpy as np
 from PIL import ImageFont, ImageDraw, Image
+from PIL import features as pil_features
 
 # Local imports
 from .config import Params
@@ -36,7 +37,7 @@ def write_font_center(
     font_path: str,
     font_size: int = Params.FONT_SIZE.value,
     font_color: Tuple[int, int, int, int] = Params.FONT_COLOR.value,
-    features: List[str] = Params.FONT_FEATURES.value,
+    features: Optional[List[str]] = Params.FONT_FEATURES.value,
     height_offset: int = Params.HEIGHT_OFFSET.value,
 ) -> np.array:
     """
@@ -50,7 +51,7 @@ def write_font_center(
     :param font_color: The RGBA color of the font to use. Defaults to color-matched 252, 252, 252, 0 in order to be
     consistent with Jellyfin's library cover styling.
     :param features: Pillow features to use while drawing the font. Defaults to remove kerning in order to be consistent
-    with Jellyfin's library cover styling.
+    with Jellyfin's library cover styling. Ignored (set to None) when the raqm layout engine is unavailable.
     :param height_offset: Height offset (in pixels) to make the text off-center. Positive integers will move the text
     upward. Defaults to manually matched 64 in order to be consistent with Jellyfin's library cover styling.
     :return: NumPy array reporesenting the new image with drawn text.
@@ -58,8 +59,21 @@ def write_font_center(
     # Unpack size into width and height variables
     image_width, image_height = size
 
+    # OpenType features (here: disabling kerning) require the raqm layout engine.
+    # Pillow wheels bundle raqm, but on Linux/macOS it needs a system fribidi
+    # library at runtime. When raqm is unavailable, fall back to the basic layout
+    # engine, which never applies kerning, so no feature flag is needed to
+    # disable it and the rendered output is visually identical.
+    if pil_features.check("raqm"):
+        layout_engine: ImageFont.Layout = ImageFont.Layout.RAQM
+    else:
+        layout_engine: ImageFont.Layout = ImageFont.Layout.BASIC
+        features = None
+
     # Define the font as a variable
-    font: ImageFont.FreeTypeFont = ImageFont.truetype(font_path, font_size)
+    font: ImageFont.FreeTypeFont = ImageFont.truetype(
+        font_path, font_size, layout_engine=layout_engine
+    )
 
     # Turn the image into a pillow ImageDraw
     pillow_image: Image = Image.fromarray(image)

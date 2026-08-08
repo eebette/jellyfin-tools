@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple, List
+from typing import Tuple
 
 
 class Params(Enum):
@@ -7,7 +7,6 @@ class Params(Enum):
     FONT_DIRECTORY: str = "fonts"
     FONT_SIZE: int = 112
     FONT_COLOR: Tuple[int, int, int, int] = (252, 252, 252, 0)
-    FONT_FEATURES: List[str] = ["-kern"]
     HEIGHT_OFFSET: int = 64
     WIDTH: int = 960
     HEIGHT: int = 540

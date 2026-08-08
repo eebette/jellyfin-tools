@@ -38,35 +38,8 @@ styling library on the custom image.
 
 `pip install ./Jellyfin-Tools`
 
-## Optional: FriBiDi
-
-Installing the system `fribidi` library enables Pillow's `raqm` text-shaping engine, which this tool will use
-automatically for full OpenType text layout (explicit font features, bidirectional text, and complex-script shaping).
-
-It is genuinely optional. Without it, the CLI falls back to Pillow's basic text layout engine, which renders the bundled
-Latin font at the same size and position — the two differ only in antialiasing at glyph edges (~0.2% of pixels).
-
-| Platform | Install |
-|----------|---------|
-| Debian/Ubuntu | `apt install libfribidi0` |
-| Fedora/RHEL | `dnf install fribidi` |
-| macOS | `brew install fribidi` |
-| Windows (conda) | `conda install -c conda-forge fribidi` |
-| Windows (otherwise) | Install [MSYS2](https://www.msys2.org/), run `pacman -S mingw-w64-ucrt-x86_64-fribidi`, then add its `bin` directory (usually `C:\msys64\ucrt64\bin`) to your `PATH` |
-
-> ℹ️ Pillow loads `fribidi` by name at import time, so on Windows the directory containing the dll has to be somewhere
-> Windows will look. In an activated conda environment that is already true. For MSYS2 you have to add the directory to
-> your `PATH` yourself — the package manager won't do it for you.
-
-> ❗ Dropping the dll into a virtualenv's `Scripts` directory does *not* work, even though that's where `python.exe`
-> lives. Neither does putting it in `site-packages/PIL`. A directory on `PATH` is the reliable option.
-
-Upstream Pillow does not publish a prebuilt Windows dll for this (its docs tell you to compile FriBiDi yourself), which
-is why the recommendation is to let a package manager supply it rather than sourcing a loose dll from anywhere.
-
-You can check whether it was picked up with:
-
-`python -c "from PIL import features; print(features.check('raqm'))"`
+> ℹ️ There are no system dependencies beyond Python. Text rendering uses Pillow's basic layout engine, which needs no
+> external libraries on any platform.
 
 # Usage
 
@@ -142,20 +115,24 @@ Versions up to `1.0.2` shipped an interactive installer that tried to download W
 text-shaping engine. On Linux and macOS this could never succeed (Windows dll's don't load there), which caused an
 endless install prompt loop ([#8](https://github.com/eebette/jellyfin-tools/issues/8)).
 
-As of `1.1.0` the installer is gone, and no manual steps are required:
+As of `1.1.0` the CLI doesn't use `raqm` at all, so there is nothing to install and no prompt on any platform. `raqm`
+was only ever used to switch off kerning, and Pillow's basic layout engine doesn't apply kerning in the first place —
+so the covers come out the same, without depending on a system library that may or may not be present.
 
-- Modern Pillow wheels already bundle `raqm` on all platforms (statically linked on Windows).
-- On every platform — Windows included — Pillow's bundled `raqm` loads the system `fribidi` library at runtime when it
-  is present. Pillow deliberately does not ship `fribidi` itself, so it can only come from your system package manager;
-  see [Optional: FriBiDi](#optional-fribidi) if you want it.
-- When `raqm` isn't available, the CLI automatically falls back to Pillow's basic text layout engine. For the bundled
-  font the rendered output is visually identical, and no prompt or install step happens.
-
-On Windows the old installer copied its dll's next to whichever `python.exe` was first on your `PATH`. That location is
-only searched when you are *not* in a virtualenv, so venv users hit the same "install and re-run" loop that Linux and
-macOS users did.
+A side benefit: rendering no longer varies by machine. Previously the same title could produce slightly different
+covers depending on whether `fribidi` happened to be installed.
 
 The dll archive the old installer downloaded has also been removed from this repository, so on `1.0.2` and earlier the
 prompt now fails with a download error instead of installing anything. There is nothing to repair — upgrade instead:
 
 `pip install --upgrade jellyfin-tools`
+
+## My library title has accented characters and they aren't rendering
+
+This was fixed in `1.1.0`. Titles are normalised to Unicode NFC before rendering, so `é` renders correctly whether it
+arrives composed (one codepoint) or decomposed (an `e` followed by a combining accent). The decomposed form is what
+macOS uses for filenames, so it turns up whenever a title is derived from a path — for example:
+
+`jellyfin-tools cover create --image "$dir/fanart.jpg" --title "$(basename "$dir")"`
+
+Before `1.1.0`, that case dropped the accents and pushed the text off the edge of the cover.

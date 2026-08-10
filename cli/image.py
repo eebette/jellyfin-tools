@@ -1,7 +1,8 @@
 # Standard library imports
 import os
+import unicodedata
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple
 
 # Package imports
 import cv2
@@ -36,7 +37,6 @@ def write_font_center(
     font_path: str,
     font_size: int = Params.FONT_SIZE.value,
     font_color: Tuple[int, int, int, int] = Params.FONT_COLOR.value,
-    features: List[str] = Params.FONT_FEATURES.value,
     height_offset: int = Params.HEIGHT_OFFSET.value,
 ) -> np.array:
     """
@@ -49,8 +49,6 @@ def write_font_center(
     Jellyfin's library cover styling.
     :param font_color: The RGBA color of the font to use. Defaults to color-matched 252, 252, 252, 0 in order to be
     consistent with Jellyfin's library cover styling.
-    :param features: Pillow features to use while drawing the font. Defaults to remove kerning in order to be consistent
-    with Jellyfin's library cover styling.
     :param height_offset: Height offset (in pixels) to make the text off-center. Positive integers will move the text
     upward. Defaults to manually matched 64 in order to be consistent with Jellyfin's library cover styling.
     :return: NumPy array reporesenting the new image with drawn text.
@@ -58,23 +56,30 @@ def write_font_center(
     # Unpack size into width and height variables
     image_width, image_height = size
 
-    # Define the font as a variable
-    font: ImageFont.FreeTypeFont = ImageFont.truetype(font_path, font_size)
+    # Compose the message before measuring or drawing it. Titles arrive verbatim from
+    # the command line, and no shell normalises them, so a decomposed title (an "e"
+    # followed by a combining accent, which is how macOS stores filenames) would
+    # otherwise render with the accents dropped and the text pushed off the cover.
+    message = unicodedata.normalize("NFC", message)
+
+    # Pin the basic layout engine. Pillow would otherwise pick raqm whenever a system
+    # fribidi library happens to be installed, which would make the same title render
+    # differently from one machine to the next. Raqm's only effect on the bundled font
+    # is kerning, which we want off anyway and which the basic engine never applies.
+    font: ImageFont.FreeTypeFont = ImageFont.truetype(
+        font_path, font_size, layout_engine=ImageFont.Layout.BASIC
+    )
 
     # Turn the image into a pillow ImageDraw
     pillow_image: Image = Image.fromarray(image)
     draw: ImageDraw = ImageDraw.Draw(pillow_image)
 
     # Get the height and width of the text message for centering
-    _, _, draw_width, draw_height = draw.textbbox(
-        (0, 0), message, font=font, features=features
-    )
+    _, _, draw_width, draw_height = draw.textbbox((0, 0), message, font=font)
 
     # Figure out how far below the baseline the text goes
     # "ls" is "left baseline" as our (0,0) anchor
-    _, _, _, descender_height = draw.textbbox(
-        (0, 0), message, anchor="ls", font=font, features=features
-    )
+    _, _, _, descender_height = draw.textbbox((0, 0), message, anchor="ls", font=font)
 
     draw_height -= descender_height
 
@@ -87,7 +92,6 @@ def write_font_center(
         message,
         font=font,
         fill=font_color,
-        features=features,
     )
 
     # Convert the image into a numpy array

@@ -2,7 +2,7 @@
 import os
 import unicodedata
 from pathlib import Path
-from typing import Tuple
+from typing import Optional, Tuple
 
 # Package imports
 import cv2
@@ -161,6 +161,7 @@ def create_library_image(
     library_name: str,
     destination: str = str(),
     shadow: float = Params.FOREGROUND_WEIGHT.value,
+    font: Optional[str] = None,
 ) -> Path:
     """
     The main function for this module. Combines other functions to generate a library image for use in Jellyfin or Emby.
@@ -171,6 +172,8 @@ def create_library_image(
     :param library_name: The text to use for the library image.
     :param destination:
     :param shadow: The foreground weight to use for the library image.
+    :param font: Optional path to a font file (.ttf/.otf) to use for the title text. Defaults to the bundled Prima
+    Sans Bold, which only covers Latin characters — pass a font with the needed coverage for other scripts.
     :return: The file path of the output image.
     """
     # Read in the image file as a cv2 image.
@@ -190,8 +193,9 @@ def create_library_image(
         foreground, resized_background, shadow, 1.0 - shadow
     )
 
-    # Write the library name onto the shaded image
-    font_path = get_font_path()
+    # Write the library name onto the shaded image, using the provided font file
+    # when given and the bundled Prima Sans Bold otherwise
+    font_path = font if font else get_font_path()
     height, width = (background_size[0], background_size[1])
     library_cover: np.ndarray = write_font_center(
         library_cover, (width, height), library_name, font_path

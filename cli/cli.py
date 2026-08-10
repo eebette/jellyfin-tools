@@ -1,5 +1,6 @@
 # Standard library imports
 import argparse
+import os
 import sys
 
 # Local imports
@@ -16,12 +17,21 @@ def run(args):
     # The number of image args must match the number of title args.()
     assert len(args.image) == len(args.title)
 
+    # Fail early with a clear message if the provided font file doesn't exist.
+    if args.font and not os.path.isfile(args.font):
+        print(f"Font file not found: {args.font}")
+        sys.exit(1)
+
     # The shadow opacity should be clamped between 0 and 1.
     args.shadow = max(0, min(1, args.shadow))
     for t, i in enumerate(args.image):
         title = args.title[t]
         output = create_library_image(
-            file=i, library_name=title, destination=args.destination, shadow=args.shadow
+            file=i,
+            library_name=title,
+            destination=args.destination,
+            shadow=args.shadow,
+            font=args.font,
         )
         print(f"Generated image to: {output}")
 
@@ -74,6 +84,15 @@ def main():
         action="store",
         type=float,
         default=Params.FOREGROUND_WEIGHT.value,
+    )
+
+    create_parser.add_argument(
+        "--font",
+        dest="font",
+        action="store",
+        type=str,
+        default=None,
+        help="Path to a font file (.ttf/.otf) to use for the title text instead of the bundled Prima Sans Bold",
     )
 
     # Parse the args

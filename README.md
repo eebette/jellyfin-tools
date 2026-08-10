@@ -66,6 +66,19 @@ Use `0` for no shadow darkening of the cover image. For example:
 
 > `jellyfin-tools create --image /path/to/image.png --title Library --shadow 0`
 
+### Custom font option
+
+You can use the `--font` flag to provide a path to your own font file (any FreeType-supported format, e.g. `.ttf` or
+`.otf`) to use for the title text instead of the bundled Prima Sans Bold:
+
+> `jellyfin-tools cover create --image /path/to/image.png --title Эфир --font /path/to/DejaVuSans-Bold.ttf`
+
+The bundled font only covers Latin characters, so this is needed for titles in other scripts — Cyrillic, Greek, etc.
+([#10](https://github.com/eebette/jellyfin-tools/issues/10)).
+
+>❗ Text is rendered without complex-script shaping: scripts that require joining or reordering (Arabic, Hebrew with
+> points, Indic scripts, Thai) will not render correctly even with a font that covers them.
+
 
 # Tools
 ## `cover`

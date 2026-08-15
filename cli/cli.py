@@ -50,13 +50,13 @@ def main():
     )
 
     subparser = parser.add_subparsers(
-        title="subparsers", dest="subcommand", required=True
+        title="subparsers", dest="command", required=True
     )
 
     cover_parser = subparser.add_parser("cover")
 
     cover_subparser = cover_parser.add_subparsers(
-        title="subparsers", dest="subcommand", required=True
+        title="subparsers", dest="cover_command", required=True
     )
 
     create_parser = cover_subparser.add_parser("create")
@@ -106,7 +106,9 @@ def main():
             print("Encountered an error: %s", str(e))
             sys.exit(1)
     else:
-        eval(args.subcommand + "_parser").print_help()
+        # Both subparser levels are required, so argparse errors out before this
+        # branch can normally be reached; kept as a safe fallback.
+        parser.print_help()
 
 
 if __name__ == "__main__":

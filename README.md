@@ -38,8 +38,8 @@ styling library on the custom image.
 
 `pip install ./Jellyfin-Tools`
 
-> ℹ️ There are no system dependencies beyond Python. Text rendering uses Pillow's basic layout engine, which needs no
-> external libraries on any platform.
+> ℹ️ There are no system dependencies beyond Python. Image processing and text rendering are pure Pillow, which ships
+> prebuilt wheels for every platform — no OpenCV, no libGL, nothing to apt-install.
 
 # Usage
 

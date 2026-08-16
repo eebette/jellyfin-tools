@@ -11,4 +11,3 @@ class Params(Enum):
     WIDTH: int = 960
     HEIGHT: int = 540
     FOREGROUND_WEIGHT: float = 0.5
-    BACKGROUND_WEIGHT: float = 0.5

@@ -5,9 +5,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 # Package imports
-import cv2
-import numpy as np
-from PIL import ImageFont, ImageDraw, Image
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont
 
 # Local imports
 from .config import Params
@@ -31,14 +29,14 @@ def get_font_path(
 
 
 def write_font_center(
-    image: np.ndarray,
+    image: Image.Image,
     size: Tuple[int, int],
     message: str,
     font_path: str,
     font_size: int = Params.FONT_SIZE.value,
     font_color: Tuple[int, int, int, int] = Params.FONT_COLOR.value,
     height_offset: int = Params.HEIGHT_OFFSET.value,
-) -> np.array:
+) -> Image.Image:
     """
     Function for writing text in a given font on an image.
     :param image: The image on which to draw text.
@@ -51,7 +49,7 @@ def write_font_center(
     consistent with Jellyfin's library cover styling.
     :param height_offset: Height offset (in pixels) to make the text off-center. Positive integers will move the text
     upward. Defaults to manually matched 64 in order to be consistent with Jellyfin's library cover styling.
-    :return: NumPy array reporesenting the new image with drawn text.
+    :return: The image with the text drawn on it.
     """
     # Unpack size into width and height variables
     image_width, image_height = size
@@ -70,9 +68,8 @@ def write_font_center(
         font_path, font_size, layout_engine=ImageFont.Layout.BASIC
     )
 
-    # Turn the image into a pillow ImageDraw
-    pillow_image: Image = Image.fromarray(image)
-    draw: ImageDraw = ImageDraw.Draw(pillow_image)
+    # Prepare to draw on the image
+    draw: ImageDraw.ImageDraw = ImageDraw.Draw(image)
 
     # Get the height and width of the text message for centering
     _, _, draw_width, draw_height = draw.textbbox((0, 0), message, font=font)
@@ -94,66 +91,40 @@ def write_font_center(
         fill=font_color,
     )
 
-    # Convert the image into a numpy array
-    image: np.array = np.array(pillow_image)
     return image
 
 
 def resize_image(
-    image: np.ndarray,
+    image: Image.Image,
     width: int = Params.WIDTH.value,
     height: int = Params.HEIGHT.value,
-    interpolation: int = cv2.INTER_LINEAR,
-) -> np.ndarray:
+    resample: Image.Resampling = Image.Resampling.BILINEAR,
+) -> Image.Image:
     """
-
+    Resizes an image.
     :param image: The image to resize.
     :param width: The width to resize to. Defaults  in order to be consistent with Jellyfin's library cover styling.
     :param height: The height to resize to. Defaults  in order to be consistent with Jellyfin's library cover styling.
-    :param interpolation: Integer representation of the interpolation method to use for resizing.
-    :return: The resized image as a NumPy `ndarray`.
+    :param resample: The resampling filter to use for resizing. Defaults to bilinear, matching the previous OpenCV
+    implementation's interpolation.
+    :return: The resized image.
     """
-    resized_image: np.ndarray = cv2.resize(
-        image, (width, height), interpolation=interpolation
-    )
+    resized_image: Image.Image = image.resize((width, height), resample=resample)
     return resized_image
 
 
-def generate_black_layer(
-    height: int, width: int, channels: int, dtype: str = "uint8"
-) -> np.ndarray:
+def apply_shadow(
+    image: Image.Image, shadow: float = Params.FOREGROUND_WEIGHT.value
+) -> Image.Image:
     """
-    Generates a layer of black to overlay on the base image used for the library cover.
-    :param height: Height of layer to generate.
-    :param width: Width of the layer to generate.
-    :param channels: Number of channels in the layer to generate.
-    :param dtype: String-represented desired data-type for the array.
-    :return: The black layer image as a NumPy ndarray.
+    Darkens the image by blending it toward black, producing the shadow overlay effect used by Jellyfin's library cover
+    styling.
+    :param image: The image to darken.
+    :param shadow: The relative weight of the black overlay. 0 leaves the image unchanged, 1 makes it fully black.
+    :return: The darkened image.
     """
-    layer: np.ndarray = np.zeros((height, width, channels), dtype=dtype)
-    return layer
-
-
-def overlay_images(
-    foreground: np.ndarray,
-    background: np.ndarray,
-    foreground_weight: float = Params.FOREGROUND_WEIGHT.value,
-    background_weight: float = Params.BACKGROUND_WEIGHT.value,
-) -> np.ndarray:
-    """
-    Overlays 2 images with a given transparency.
-    :param foreground: The foreground image to overlay.
-    :param background: The background image to overlay.
-    :param foreground_weight: The relative weight of the foreground image to use during the blend. This and
-    `background_weight` must add up to 1.
-    :param background_weight: The relative weight of the background image to use during the blend. This and
-    `foreground_weight` must add up to 1.
-    :return: The overlaid image as a NumPy `ndarray`.
-    """
-    image: np.ndarray = cv2.addWeighted(
-        background, background_weight, foreground, foreground_weight, 1.0
-    )
-    return image
+    shadowed_image: Image.Image = ImageEnhance.Brightness(image).enhance(1.0 - shadow)
+    return shadowed_image
 
 
 def create_library_image(
@@ -176,29 +147,20 @@ def create_library_image(
     Sans Bold, which only covers Latin characters — pass a font with the needed coverage for other scripts.
     :return: The file path of the output image.
     """
-    # Read in the image file as a cv2 image.
-    background: np.ndarray = cv2.imread(file)
+    # Read in the image file, normalised to RGB (handles palette, RGBA, and grayscale inputs)
+    background: Image.Image = Image.open(file).convert("RGB")
 
     # Resize the image for Jellyfin
-    resized_background: np.ndarray = resize_image(background)
+    resized_background: Image.Image = resize_image(background)
 
-    # Get the size of the image in order to create a same-size black overlay layer
-    background_size: Tuple[int, int, int] = resized_background.shape
-
-    # Generate a black layer of same size as image for shading overlay
-    foreground: np.ndarray = generate_black_layer(*background_size)
-
-    # Overlay the base image and the black overlay for shading effect
-    library_cover: np.ndarray = overlay_images(
-        foreground, resized_background, shadow, 1.0 - shadow
-    )
+    # Darken the image for the shadow overlay effect
+    library_cover: Image.Image = apply_shadow(resized_background, shadow)
 
     # Write the library name onto the shaded image, using the provided font file
     # when given and the bundled Prima Sans Bold otherwise
     font_path = font if font else get_font_path()
-    height, width = (background_size[0], background_size[1])
-    library_cover: np.ndarray = write_font_center(
-        library_cover, (width, height), library_name, font_path
+    library_cover = write_font_center(
+        library_cover, library_cover.size, library_name, font_path
     )
 
     # String manipulation to determine the file path of the input image and output target.
@@ -219,7 +181,13 @@ def create_library_image(
         else:
             output_file_name: str = destination
 
-    # Write the library cover in the same directory as the input file.
-    cv2.imwrite(output_file_name, library_cover)
+    # Write the library cover. JPEG quality matches the previous OpenCV implementation's
+    # default (95) rather than Pillow's lower default (75).
+    save_options = (
+        {"quality": 95}
+        if Path(output_file_name).suffix.lower() in (".jpg", ".jpeg")
+        else {}
+    )
+    library_cover.save(output_file_name, **save_options)
 
     return Path(output_file_name)

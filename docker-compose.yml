@@ -1,0 +1,10 @@
+# One-shot CLI convenience wrapper. Put your source images in the current
+# directory (mounted at /data) and run, e.g.:
+#
+#   docker compose run --rm jellyfin-tools cover create --image /data/art.png --title Movies
+#
+services:
+  jellyfin-tools:
+    image: ghcr.io/eebette/jellyfin-tools:latest
+    volumes:
+      - ./:/data

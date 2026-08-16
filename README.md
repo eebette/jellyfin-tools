@@ -43,8 +43,8 @@ styling library on the custom image.
 
 ## Docker
 
-No local Python needed — images are published to GitHub Container Registry for `amd64` and `arm64`
-([#17](https://github.com/eebette/jellyfin-tools/issues/17)). Mount the directory containing your images at `/data`:
+No local Python needed — images are published to GitHub Container Registry for `amd64` and `arm64`. 
+Mount the directory containing your images at `/data`:
 
 ```sh
 docker run --rm -v "$(pwd):/data" ghcr.io/eebette/jellyfin-tools cover create --image /data/art.png --title Movies
@@ -94,7 +94,6 @@ You can use the `--font` flag to provide a path to your own font file (any FreeT
 > `jellyfin-tools cover create --image /path/to/image.png --title Эфир --font /path/to/DejaVuSans-Bold.ttf`
 
 The bundled font only covers Latin characters, so this is needed for titles in other scripts — Cyrillic, Greek, etc.
-([#10](https://github.com/eebette/jellyfin-tools/issues/10)).
 
 >❗ Text is rendered without complex-script shaping: scripts that require joining or reordering (Arabic, Hebrew with
 > points, Indic scripts, Thai) will not render correctly even with a font that covers them.
@@ -139,33 +138,3 @@ parse it correct. Example:
 ![img_2.png](docs/img_3.png)
 
 Much better!
-
-# FAQ
-
-## Older versions asked me to install dll's (`libraqm and/or fribidi dll's are not found!`)
-
-Versions up to `1.0.2` shipped an interactive installer that tried to download Windows dll's for Pillow's `raqm`
-text-shaping engine. On Linux and macOS this could never succeed (Windows dll's don't load there), which caused an
-endless install prompt loop ([#8](https://github.com/eebette/jellyfin-tools/issues/8)).
-
-As of `1.1.0` the CLI doesn't use `raqm` at all, so there is nothing to install and no prompt on any platform. `raqm`
-was only ever used to switch off kerning, and Pillow's basic layout engine doesn't apply kerning in the first place —
-so the covers come out the same, without depending on a system library that may or may not be present.
-
-A side benefit: rendering no longer varies by machine. Previously the same title could produce slightly different
-covers depending on whether `fribidi` happened to be installed.
-
-The dll archive the old installer downloaded has also been removed from this repository, so on `1.0.2` and earlier the
-prompt now fails with a download error instead of installing anything. There is nothing to repair — upgrade instead:
-
-`pip install --upgrade jellyfin-tools`
-
-## My library title has accented characters and they aren't rendering
-
-This was fixed in `1.1.0`. Titles are normalised to Unicode NFC before rendering, so `é` renders correctly whether it
-arrives composed (one codepoint) or decomposed (an `e` followed by a combining accent). The decomposed form is what
-macOS uses for filenames, so it turns up whenever a title is derived from a path — for example:
-
-`jellyfin-tools cover create --image "$dir/fanart.jpg" --title "$(basename "$dir")"`
-
-Before `1.1.0`, that case dropped the accents and pushed the text off the edge of the cover.

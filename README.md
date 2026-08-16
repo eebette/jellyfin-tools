@@ -41,6 +41,26 @@ styling library on the custom image.
 > ℹ️ There are no system dependencies beyond Python. Image processing and text rendering are pure Pillow, which ships
 > prebuilt wheels for every platform — no OpenCV, no libGL, nothing to apt-install.
 
+## Docker
+
+No local Python needed — images are published to GitHub Container Registry for `amd64` and `arm64`
+([#17](https://github.com/eebette/jellyfin-tools/issues/17)). Mount the directory containing your images at `/data`:
+
+```sh
+docker run --rm -v "$(pwd):/data" ghcr.io/eebette/jellyfin-tools cover create --image /data/art.png --title Movies
+```
+
+Or with the [`docker-compose.yml`](docker-compose.yml) from this repository:
+
+```sh
+docker compose run --rm jellyfin-tools cover create --image /data/art.png --title Movies
+```
+
+The output lands next to the source image (or wherever `--destination` points, as long as it's under `/data`).
+
+> ℹ️ The container runs as root by default, so generated files will be root-owned. Add
+> `--user "$(id -u):$(id -g)"` to the `docker run` command to write them as your own user.
+
 # Usage
 
 ## Jellyfin Library Covers

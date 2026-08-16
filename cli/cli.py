@@ -2,6 +2,7 @@
 import argparse
 import os
 import sys
+import traceback
 
 # Local imports
 from cli.config import Params
@@ -19,7 +20,7 @@ def run(args):
 
     # Fail early with a clear message if the provided font file doesn't exist.
     if args.font and not os.path.isfile(args.font):
-        print(f"Font file not found: {args.font}")
+        print(f"Font file not found: {args.font}", file=sys.stderr)
         sys.exit(1)
 
     # The shadow opacity should be clamped between 0 and 1.
@@ -103,7 +104,10 @@ def main():
         try:
             args.func(args)
         except Exception as e:
-            print("Encountered an error: %s", str(e))
+            # Print the full traceback when --verbose is set
+            if args.verbose:
+                traceback.print_exc()
+            print(f"Encountered an error: {e}", file=sys.stderr)
             sys.exit(1)
     else:
         # Both subparser levels are required, so argparse errors out before this
